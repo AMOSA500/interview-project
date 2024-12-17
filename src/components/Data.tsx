@@ -2,6 +2,7 @@ import { SampleData } from "api/types";
 import axios from 'axios';
 import { useEffect, useState } from "react";
 
+
 function Data() {
     const [data, setData] = useState<SampleData | undefined>(undefined);
 
@@ -37,3 +38,4 @@ function Data() {
 }
 
 export default Data
+

@@ -5,9 +5,9 @@ import { SampleData } from './types';
 const DATA_URL = 'https://sampleapi.squaredup.com/integrations/v1/service-desk?datapoints=500';
 
 type TypeOfIssuesCounts = {
-    problem: number;
-    questions: number;
-    tasks: number;
+    problem: number
+    questions: number
+    tasks: number
 };
 
 export const GET = async (req: Request, res: Response) => {
@@ -22,16 +22,16 @@ export const GET = async (req: Request, res: Response) => {
         data.results.forEach((result) => {
             switch (result.type) {
                 case 'problem':
-                    typeOfIssuesCounts.problem += 1;
-                    break;
+                    typeOfIssuesCounts.problem += 1
+                    break
                 case 'question':
-                    typeOfIssuesCounts.questions += 1;
+                    typeOfIssuesCounts.questions += 1
                     break;
                 case 'task':
-                    typeOfIssuesCounts.tasks += 1;
-                    break;
+                    typeOfIssuesCounts.tasks += 1
+                    break
                 default:
-                    break;
+                    break
             }
         });
 
@@ -42,8 +42,8 @@ export const GET = async (req: Request, res: Response) => {
             tasks: (typeOfIssuesCounts.tasks / totalCount) * 100,
         };
 
-        res.send(typeOfIssuesPercentage);
+        return typeOfIssuesPercentage
     } catch (error) {
-        res.status(500).send({ error: 'Issue fetching data...' });
+        res.status(500).send({ error: 'Issue fetching data...' })
     }
 }
