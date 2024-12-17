@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from "react-query"; // Import React Query's useQuery
 import axios from "axios"; // Axios is used for making HTTP requests
-import { SampleData } from "api/types";
 
 type PercentageFormat = {
     Problems: number;
@@ -16,7 +16,7 @@ type PriorityFormat = {
 
 // Helper function to calculate the percentage of each issue type (problem, task, question)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function calculateTypePercentages(data) {
+function calculateTypePercentages(data: any[]) {
     const total = data.length; // Get the total number of issues
     const counts: PercentageFormat = {
         Problems: 0,
@@ -45,7 +45,7 @@ function calculateTypePercentages(data) {
     // Return an array of percentages for each issue type
     const percentages = [];
     for (const type in counts) {
-        const count = counts[type];
+        const count = counts[type as keyof PercentageFormat];
         const percentage = ((count / total) * 100).toFixed(2); // Calculate the percentage
         percentages.push({ type: type, percentage: percentage });
     }
@@ -54,7 +54,7 @@ function calculateTypePercentages(data) {
 }
 
 // Helper function to calculate the percentage of each priority (high, medium, low)
-function calculatePriorityPercentages(data) {
+function calculatePriorityPercentages(data: any[]) {
     const total = data.length; // Get the total number of issues
     const counts: PriorityFormat = {
         High: 0,
@@ -83,7 +83,7 @@ function calculatePriorityPercentages(data) {
     // Return an array of percentages for each priority
     const percentages = [];
     for (const priority in counts) {
-        const count = counts[priority];
+        const count = counts[priority as keyof PriorityFormat];
         const percentage = ((count / total) * 100).toFixed(2); // Calculate the percentage
         percentages.push({ priority: priority, percentage: percentage });
     }
@@ -92,8 +92,10 @@ function calculatePriorityPercentages(data) {
 }
 
 // Helper function to calculate the average time it took to close high priority issues
-function calculateAverageResolutionTime(data) {
-    const highPriorityIssues = data.filter(function (issue) {
+function calculateAverageResolutionTime(data: any[]) {
+    const highPriorityIssues = data.filter(function (issue: {
+        priority: string;
+    }) {
         return issue.priority === "high"; // Filter only high priority issues
     });
 
@@ -113,22 +115,21 @@ function calculateAverageResolutionTime(data) {
 
     // Calculate the average resolution time in hours
     const averageResolutionTime = (
-        totalResolutionTime /
-        highPriorityIssues.length /
+        Math.abs(totalResolutionTime / highPriorityIssues.length) /
         (1000 * 60 * 60)
     ).toFixed(2);
     return averageResolutionTime; // Return the average resolution time in hours
 }
 
 // Helper function to find the satisfaction score for the issue that took the longest time to solve
-function findLongestResolutionSatisfactionScore(data) {
+function findLongestResolutionSatisfactionScore(data: any[]) {
     const longestIssue = { time: 0, score: null };
 
     // Loop through the issues to find the one with the longest resolution time
     data.forEach(function (issue) {
         const createdTime = new Date(issue.created).getTime();
         const updatedTime = new Date(issue.updated).getTime();
-        const resolutionTime = updatedTime - createdTime;
+        const resolutionTime = Math.abs(updatedTime - createdTime) / 36e5; // Converted to hours
 
         // If this issue took longer to resolve, update the longestIssue object
         if (resolutionTime > longestIssue.time) {
@@ -168,7 +169,9 @@ function Data() {
     // Render the results and insights
     return (
         <div className="border p-4">
-            <h2 className="mb-2 text-lg font-bold">Insights</h2>
+            <h2 className="mb-2 text-lg font-bold">
+                Interview Project coding &#128071;{" "}
+            </h2>
 
             <div className="mb-4">
                 <h3 className="text-sm font-semibold">
