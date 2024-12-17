@@ -19,8 +19,8 @@ export interface SampleData {
                 from: {
                     name: string;
                     email: string;
-                }
-            }
+                };
+            };
         };
         ticket_form_id: string;
     }[];

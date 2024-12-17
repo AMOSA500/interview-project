@@ -1,5 +1,6 @@
 import { useQuery } from "react-query"; // Import React Query's useQuery
 import axios from "axios"; // Axios is used for making HTTP requests
+import { SampleData } from "api/types";
 
 type PercentageFormat = {
     Problems: number;
@@ -7,10 +8,15 @@ type PercentageFormat = {
     Task: number;
 };
 
+type PriorityFormat = {
+    High: number;
+    Normal: number;
+    Low: number;
+};
+
 // Helper function to calculate the percentage of each issue type (problem, task, question)
-function calculateTypePercentages(
-    data: { type: string | number }[]
-): PercentageFormat {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function calculateTypePercentages(data) {
     const total = data.length; // Get the total number of issues
     const counts: PercentageFormat = {
         Problems: 0,
@@ -19,7 +25,7 @@ function calculateTypePercentages(
     }; // Initialize an empty object to store counts for each type
 
     // Count the occurrences of each issue type
-    data.forEach(function (issue: { type: string | number }) {
+    data.forEach(function (issue) {
         switch (issue.type) {
             case "problem":
                 counts.Problems += 1;
@@ -50,11 +56,28 @@ function calculateTypePercentages(
 // Helper function to calculate the percentage of each priority (high, medium, low)
 function calculatePriorityPercentages(data) {
     const total = data.length; // Get the total number of issues
-    const counts = {}; // Initialize an empty object to store counts for each priority
+    const counts: PriorityFormat = {
+        High: 0,
+        Normal: 0,
+        Low: 0,
+    }; // Initialize an empty object to store counts for each priority
 
     // Count the occurrences of each priority
     data.forEach(function (issue) {
-        counts[issue.priority] = (counts[issue.priority] || 0) + 1;
+        switch (issue.priority) {
+            case "normal":
+                counts.Normal += 1;
+                break;
+            case "high":
+                counts.High += 1;
+                break;
+            case "low":
+                counts.Low += 1;
+                break;
+
+            default:
+                break;
+        }
     });
 
     // Return an array of percentages for each priority
@@ -99,7 +122,7 @@ function calculateAverageResolutionTime(data) {
 
 // Helper function to find the satisfaction score for the issue that took the longest time to solve
 function findLongestResolutionSatisfactionScore(data) {
-    let longestIssue = { time: 0, score: null };
+    const longestIssue = { time: 0, score: null };
 
     // Loop through the issues to find the one with the longest resolution time
     data.forEach(function (issue) {
@@ -121,7 +144,7 @@ function findLongestResolutionSatisfactionScore(data) {
 function Data() {
     // Fetch data using React Query
     const { data, isLoading, error } = useQuery(
-        "fetchData", // The query name
+        "/", // The query name
         async () => {
             // Make a request to the API and return the data
             const response = await axios.get("/api/data");
